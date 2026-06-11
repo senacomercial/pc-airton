@@ -77,9 +77,10 @@ export class MatchingService {
     // Determine opposite type(s) for matching
     const oppositeTypes = this.getOppositeTypes(user.userType);
 
-    // Get candidates: opposite type, same approximate age range, with subscription
-    const minAge = Math.max(18, (user.birthDate ? this.calculateAge(user.birthDate) : 30) - 15);
-    const maxAge = (user.birthDate ? this.calculateAge(user.birthDate) : 30) + 15;
+    // Faixa etária ampla: no sugar dating a diferença de idade é esperada e
+    // desejada (daddy/mommy mais velhos, baby mais novo). Só garantimos 18+.
+    const minAge = 18;
+    const maxAge = 99;
 
     const candidates = await this.prisma.user.findMany({
       where: {
@@ -137,18 +138,20 @@ export class MatchingService {
     let score = 0;
     let factors = 0;
 
-    // Age compatibility (±10 years is best)
+    // Compatibilidade de idade no contexto sugar: a diferença de idade entre
+    // daddy/mommy e baby é esperada. Pontuamos alto para a faixa típica
+    // (10-30 anos de diferença) e só reduzimos em extremos pouco usuais.
     const userAge = this.calculateAge(user.birthDate);
     const candidateAge = this.calculateAge(candidate.birthDate);
     const ageDiff = Math.abs(userAge - candidateAge);
-    if (ageDiff <= 5) {
-      score += 100;
-    } else if (ageDiff <= 10) {
-      score += 80;
-    } else if (ageDiff <= 15) {
-      score += 50;
+    if (ageDiff >= 10 && ageDiff <= 30) {
+      score += 100; // Faixa sugar típica
+    } else if (ageDiff < 10) {
+      score += 70; // Pouca diferença ainda é ok
+    } else if (ageDiff <= 40) {
+      score += 60; // Diferença grande, mas aceitável
     } else {
-      score += 20;
+      score += 30; // Diferença extrema
     }
     factors++;
 
