@@ -107,6 +107,30 @@ Building a NestJS-based backend for a sugar dating platform with real-time chat,
   - Re-assessment recommended after 90 days
   - Answers stored as JSON for audit trail
 
+### 8. Reports & Moderação Module ✅
+- `POST /api/v1/reports` - Criar denúncia (assédio, golpe, exploração, etc.)
+- `GET /api/v1/reports/mine` - Listar denúncias do próprio usuário
+- `GET /api/v1/reports/queue` - Fila de moderação (protegida por ModeratorGuard)
+- `GET /api/v1/reports/:id` - Detalhe da denúncia com histórico e risk flags
+- `PATCH /api/v1/reports/:id/resolve` - Resolver com ação do moderador
+- **Cálculo automático de urgência**:
+  - Assédio sexual e exploração → sempre `high`
+  - Red flags de segurança no questionário do denunciado → elevam para `high`
+  - Comportamento abusivo / golpe → `medium`
+  - Demais → `low`/`medium` conforme risk flags
+- **Ações de moderação**:
+  - dismiss (arquivar), warning (advertência)
+  - suspend_24h / suspend_7d / suspend_30d (suspensão temporária)
+  - ban_permanent (banimento permanente)
+- **Consequências automáticas**:
+  - Suspensões atualizam status e suspendedUntil do usuário
+  - Notificação automática ao usuário moderado
+  - Reativação automática no login quando a suspensão expira
+- **Segurança**:
+  - ModeratorGuard restringe rotas administrativas a MODERATOR/ADMIN
+  - Validações anti auto-denúncia e anti re-resolução
+- **Schema**: enum UserRole, campo suspendedUntil, relação moderator no Report
+
 ### 7. Matching Algorithm Module ✅
 - `GET /api/v1/matches?limit=50` - Get ranked candidates with compatibility score
 - **Weighted Scoring**:
