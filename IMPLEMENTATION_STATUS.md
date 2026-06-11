@@ -25,6 +25,22 @@ Building a NestJS-based backend for a sugar dating platform with real-time chat,
 - User type mapping (sugar_daddy, sugar_baby, sugar_mommy)
 - Auto-reactivation of expired temporary suspensions on login
 
+### 10. Lives Module ✅
+- `POST /api/v1/lives` - Create live with Google Meet link (host/admin)
+- `GET /api/v1/lives/upcoming` - List scheduled and live events
+- `GET /api/v1/lives/:id` - Get live detail with participant list
+- `POST /api/v1/lives/:id/register` - Register to attend live
+- `POST /api/v1/lives/:id/attended` - Mark attendance (for future certificates)
+- `GET /api/v1/lives/me/registrations` - List my live registrations
+- `PATCH /api/v1/lives/:id/status` - Update status (host only)
+- **Status Lifecycle**: SCHEDULED → LIVE → COMPLETED
+- **Features**:
+  - Google Meet link always visible
+  - Participant counter
+  - Valid state transitions enforced
+  - Cannot register after completion
+- **Use Case**: Educational content, networking events, expert talks
+
 ### 9. Reviews & Reputação Module ✅
 - `POST /api/v1/reviews` - Create review after relationship
 - `GET /api/v1/reviews/user/:userId` - Get trust_score with dimension breakdown
@@ -277,6 +293,13 @@ Building a NestJS-based backend for a sugar dating platform with real-time chat,
 | GET | /api/v1/reviews/user/:userId | JWT | — | ✅ |
 | GET | /api/v1/reviews/user/:userId/received | JWT | — | ✅ |
 | GET | /api/v1/reviews/mine | JWT | — | ✅ |
+| POST | /api/v1/lives | JWT | — | ✅ |
+| GET | /api/v1/lives/upcoming | JWT | — | ✅ |
+| GET | /api/v1/lives/:id | JWT | — | ✅ |
+| POST | /api/v1/lives/:id/register | JWT | — | ✅ |
+| POST | /api/v1/lives/:id/attended | JWT | — | ✅ |
+| GET | /api/v1/lives/me/registrations | JWT | — | ✅ |
+| PATCH | /api/v1/lives/:id/status | JWT | — | ✅ |
 
 ## Known Issues & TODOs
 
@@ -287,9 +310,6 @@ Building a NestJS-based backend for a sugar dating platform with real-time chat,
 4. Income range options not enumerated
 
 ### Phase 2+ Features (Not in MVP)
-- [ ] **Reports & Moderation**: Abuse reporting system with moderator queue
-- [ ] **Reviews & Reputation**: Post-match reviews, trust score calculation
-- [ ] **Lives Module**: Scheduled video sessions with Google Meet integration
 - [ ] **Admin Dashboard**: Moderation queue, user management, analytics
 - [ ] **Email Notifications**: SendGrid integration for key events
 - [ ] **SMS Gateway**: Twilio integration for SMS codes
@@ -342,15 +362,17 @@ http://localhost:3000/health
 ```
 
 ## Git History
-- **Commit 1**: Initial NestJS setup, auth module, database schema
-- **Commit 2**: Payments, verification, users modules
+- **Commit 1-2**: Initial NestJS setup, auth, users, payments, verification
 - **Commit 3**: Chat module with WebSocket, encryption, smart warnings
-- **Commit 4**: Questionnaire Comportamental with 5-dimension scoring
-- **Commit 5**: Matching algorithm with weighted scoring and caching
+- **Commit 4**: Questionnaire Comportamental (30 questions, 5-dimension scoring)
+- **Commit 5**: Matching algorithm (20% demo, 40% expectations, 40% behavioral)
+- **Commit 6**: Reports & Moderation (risk-flag integration, suspensions)
+- **Commit 7**: Reviews & Reputation (trust scoring with 5 dimensions)
+- **Commit 8**: Lives Module (webinars, Google Meet, attendance tracking)
 
-## Next Steps
-1. Fix PUT /api/v1/users/profile endpoint
-2. Implement Reports & Moderation module
-3. Add comprehensive test suite (Jest)
-4. Real Mercado Pago integration with webhook handling
-5. Mobile app development (React Native)
+## Next Steps (Phase 2)
+1. **Test Suite**: Jest for auth, encryption, matching, moderation
+2. **Real Mercado Pago**: Replace mock with Preapproval API + webhooks
+3. **Admin Dashboard**: Moderation queue, user analytics, revenue reports
+4. **Mobile App**: React Native for iOS/Android
+5. **Fix**: PUT /api/v1/users/profile endpoint (500 error)
