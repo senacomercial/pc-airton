@@ -23,6 +23,29 @@ Building a NestJS-based backend for a sugar dating platform with real-time chat,
 - Password hashing with bcryptjs (12 rounds)
 - Birth date validation (minimum 18 years old)
 - User type mapping (sugar_daddy, sugar_baby, sugar_mommy)
+- Auto-reactivation of expired temporary suspensions on login
+
+### 9. Reviews & Reputação Module ✅
+- `POST /api/v1/reviews` - Create review after relationship
+- `GET /api/v1/reviews/user/:userId` - Get trust_score with dimension breakdown
+- `GET /api/v1/reviews/user/:userId/received` - List received reviews (with anonymity support)
+- `GET /api/v1/reviews/mine` - List reviews submitted by user
+- **Trust Score Calculation** (0-100):
+  - Rating (1-5) normalized to 0-100
+  - 5 dimensions (respect, communication, safety, honesty, discretion): each 1-5 normalized to 0-100
+  - Overall = average of all metrics
+  - Updated automatically after each review
+- **5 Evaluation Dimensions**:
+  - respect: respected boundaries and consent
+  - communication: clear and honest communication
+  - safety: felt emotionally/physically safe
+  - honesty: was honest about intentions
+  - discretion: maintained privacy
+- **Features**:
+  - Optional anonymous reviews (reviewer = null)
+  - Validations: no self-review, no duplicate reviews per conversation
+  - Complete review history with metadata
+- **Use Case**: Trust-building mechanism, helps users identify reliable partners, potential matching tie-breaker
 
 ### 2. Users Module ✅
 - `GET /api/v1/users/me` - Get authenticated user profile
@@ -245,6 +268,15 @@ Building a NestJS-based backend for a sugar dating platform with real-time chat,
 | POST | /api/v1/questionnaire/submit | JWT | — | ✅ |
 | GET | /api/v1/questionnaire/my-assessment | JWT | — | ✅ |
 | GET | /api/v1/matches | JWT | Sub | ✅ |
+| POST | /api/v1/reports | JWT | — | ✅ |
+| GET | /api/v1/reports/mine | JWT | — | ✅ |
+| GET | /api/v1/reports/queue | JWT | Mod | ✅ |
+| GET | /api/v1/reports/:id | JWT | Mod | ✅ |
+| PATCH | /api/v1/reports/:id/resolve | JWT | Mod | ✅ |
+| POST | /api/v1/reviews | JWT | — | ✅ |
+| GET | /api/v1/reviews/user/:userId | JWT | — | ✅ |
+| GET | /api/v1/reviews/user/:userId/received | JWT | — | ✅ |
+| GET | /api/v1/reviews/mine | JWT | — | ✅ |
 
 ## Known Issues & TODOs
 
