@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { PaymentsModule } from './payments/payments.module';
 import { VerificationModule } from './verification/verification.module';
 import { ChatModule } from './chat/chat.module';
+import { QuestionnaireModule } from './questionnaire/questionnaire.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -20,6 +21,7 @@ import { HealthController } from './health.controller';
     PaymentsModule,
     VerificationModule,
     ChatModule,
+    QuestionnaireModule,
   ],
   controllers: [HealthController],
 })
