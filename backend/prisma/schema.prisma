@@ -1,0 +1,461 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum UserType {
+  SUGAR_DADDY
+  SUGAR_BABY
+  SUGAR_MOMMY
+}
+
+enum GenderType {
+  M
+  F
+  NB
+  OTHER
+}
+
+enum AccountStatus {
+  PENDING            // Após cadastro mínimo, antes do pagamento
+  AWAITING_PAYMENT   // Cadastro feito, esperando checkout
+  PENDING_PROFILE    // Pagamento aprovado, completando perfil
+  ACTIVE             // Perfil completo, acesso liberado
+  SUSPENDED          // Suspenso por não-pagamento ou moderação
+  BANNED             // Banido permanentemente
+  DELETED            // Deletado (soft delete)
+}
+
+enum VerificationType {
+  PHONE
+  FACE
+  DOCUMENT
+  BACKGROUND
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  FAILED
+  REJECTED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  EXPIRED
+  CANCELED
+  SUSPENDED
+}
+
+enum LiveStatus {
+  SCHEDULED
+  LIVE
+  COMPLETED
+}
+
+enum ReportType {
+  ABUSIVE_BEHAVIOR
+  SCAM
+  INAPPROPRIATE_CONTENT
+  SEXUAL_HARASSMENT
+  EXPLOITATION
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  INVESTIGATING
+  RESOLVED
+  DISMISSED
+}
+
+enum ModeratorAction {
+  DISMISS
+  WARNING
+  SUSPEND_24H
+  SUSPEND_7D
+  SUSPEND_30D
+  BAN_PERMANENT
+}
+
+// Users & Authentication
+model User {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email             String         @unique @db.Citext
+  phone             String?        @unique
+  passwordHash      String
+  firstName         String
+  userType          UserType
+  gender            GenderType?
+  birthDate         DateTime
+
+  // Location
+  city              String?
+  state             String?
+  country           String?
+  latitude          Float?
+  longitude         Float?
+
+  // Verification flags
+  phoneVerified     Boolean        @default(false)
+  faceVerified      Boolean        @default(false)
+  documentVerified  Boolean        @default(false)
+  backgroundChecked Boolean        @default(false)
+  verifiedAt        DateTime?
+
+  // Account status
+  status            AccountStatus  @default(PENDING)
+
+  // Relations
+  profile           Profile?
+  sessions          Session[]
+  verifications     Verification[]
+  questionnaire     BehaviorQuestionnaire?
+  subscription      Subscription?
+  sentMessages      Message[]       @relation("sender")
+  conversations     Conversation[]  @relation("user")
+  reviews           Review[]        @relation("reviewer")
+  reviewsReceived   Review[]        @relation("reviewed")
+  reportsSubmitted  Report[]        @relation("reporter")
+  reportsAgainst    Report[]        @relation("reported")
+  liveRegistrations LiveRegistration[]
+  notifications     Notification[]
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  deletedAt         DateTime?
+
+  @@index([email])
+  @@index([phone])
+  @@index([userType])
+  @@index([status])
+  @@map("users")
+}
+
+model Profile {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String         @unique @db.Uuid
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bio               String?        @db.VarChar(500)
+  interests         String[]       // array de strings
+  lookingFor        String?
+  education         String?
+  profession        String?
+  incomeRange       String?        // sugar_daddy/mommy only: 1k-5k, 5k-15k, 15k-50k, 50k+
+  relationshipStatus String?       // single, open_relationship, married_open
+
+  // Media
+  profilePhotoUrl   String?
+  additionalPhotos  String[]       // array de URLs
+  verifiedPhotosCount Int          @default(0)
+
+  // Stats
+  totalMatches      Int            @default(0)
+  totalConversations Int           @default(0)
+  responseRate      Float?         // percentage
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([userId])
+  @@map("profiles")
+}
+
+model Session {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String         @db.Uuid
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token             String         @unique
+  refreshToken      String         @unique
+  expiresAt         DateTime
+
+  createdAt         DateTime       @default(now())
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Verification {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String         @db.Uuid
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type              VerificationType
+  status            VerificationStatus
+  metadata          Json?
+
+  verifiedAt        DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@map("verifications")
+}
+
+model BehaviorQuestionnaire {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String         @unique @db.Uuid
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  answers           Json           // [{questionId, answer, weight}]
+  overallScore      Int?           // 0-100
+  dimensionScores   Json?          // {emotional_maturity: 85, ...}
+  riskFlags         String[]       // array de red flags detectadas
+
+  version           Int            @default(1)
+  reassessAfter     DateTime?
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@unique([userId, version])
+  @@index([userId])
+  @@map("behavior_questionnaires")
+}
+
+// Subscriptions & Payments
+model Subscription {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String         @unique @db.Uuid
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  planType          String         // baby, daddy_mommy
+  mpSubscriptionId  String?        @unique // Mercado Pago subscription ID
+  status            SubscriptionStatus @default(ACTIVE)
+
+  currentPeriodStart DateTime?
+  currentPeriodEnd  DateTime?
+  cancelAt          DateTime?
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  payments          Payment[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model Payment {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subscriptionId    String         @db.Uuid
+  subscription      Subscription   @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  amount            Float
+  currency          String         @default("BRL")
+  status            String         // pending, approved, failed, refunded
+
+  mpPaymentId       String?        @unique // Mercado Pago payment ID
+  description       String?
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([subscriptionId])
+  @@index([status])
+  @@map("payments")
+}
+
+// Matching
+model Match {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user1Id           String         @db.Uuid
+  user2Id           String         @db.Uuid
+
+  compatibilityScore Float?        // 0-100
+
+  likedAt           DateTime?
+  unlikedAt         DateTime?
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@map("matches")
+}
+
+// Chat & Messages
+model Conversation {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  users             User[]         @relation("user")
+
+  lastMessage       String?
+  lastMessageAt     DateTime?
+
+  user1Id           String         @db.Uuid
+  user2Id           String         @db.Uuid
+
+  user1Archived     Boolean        @default(false)
+  user2Archived     Boolean        @default(false)
+  user1Blocked      Boolean        @default(false)
+  user2Blocked      Boolean        @default(false)
+
+  messages          Message[]
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+  @@map("conversations")
+}
+
+model Message {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  conversationId    String         @db.Uuid
+  conversation      Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  senderId          String         @db.Uuid
+  sender            User           @relation("sender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  content           String         // encriptado no banco
+  contentType       String         @default("text") // text, image, audio, video
+
+  mediaUrl          String?
+  mediaExpiresAt    DateTime?
+
+  encrypted         Boolean        @default(true)
+  encryptionKeyId   String?        // KMS key ID, não a chave
+
+  status            String         @default("sent") // sent, delivered, read
+  readAt            DateTime?
+
+  createdAt         DateTime       @default(now())
+  deletedAt         DateTime?
+
+  @@index([conversationId])
+  @@index([createdAt])
+  @@index([readAt])
+  @@map("messages")
+}
+
+// Reputation & Reviews
+model Review {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reviewerId        String         @db.Uuid
+  reviewer          User           @relation("reviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  reviewedUserId    String         @db.Uuid
+  reviewed          User           @relation("reviewed", fields: [reviewedUserId], references: [id], onDelete: Cascade)
+
+  conversationId    String         @db.Uuid
+
+  rating            Int            // 1-5
+  dimensions        Json           // {respect: 5, communication: 4, ...}
+  comment           String?        @db.VarChar(500)
+  anonymous         Boolean        @default(false)
+
+  createdAt         DateTime       @default(now())
+
+  @@unique([conversationId, reviewerId])
+  @@index([reviewedUserId])
+  @@index([createdAt])
+  @@map("reviews")
+}
+
+// Moderation
+model Report {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reporterId        String         @db.Uuid
+  reporter          User           @relation("reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  reportedUserId    String         @db.Uuid
+  reported          User           @relation("reported", fields: [reportedUserId], references: [id], onDelete: Cascade)
+
+  type              ReportType
+  description       String         @db.Text
+  evidence          Json?          // [{type, conversationId, messageId, screenshot}]
+
+  status            ReportStatus   @default(PENDING)
+  urgency           String         @default("medium") // low, medium, high
+
+  actionTaken       ModeratorAction?
+  moderatorNotes    String?
+  resolvedAt        DateTime?
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([status])
+  @@index([reportedUserId])
+  @@index([createdAt])
+  @@map("reports")
+}
+
+// Lives & Content
+model Live {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title             String
+  description       String?        @db.Text
+  startTime         DateTime
+  durationMin       Int?
+
+  hostId            String?        @db.Uuid
+
+  meetUrl           String?
+  recordingUrl      String?
+  recordingExpiresAt DateTime?
+
+  status            LiveStatus     @default(SCHEDULED)
+
+  registrations     LiveRegistration[]
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([startTime])
+  @@map("lives")
+}
+
+model LiveRegistration {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  liveId            String         @db.Uuid
+  live              Live           @relation(fields: [liveId], references: [id], onDelete: Cascade)
+
+  userId            String         @db.Uuid
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  registeredAt      DateTime       @default(now())
+  attended          Boolean?
+
+  @@unique([liveId, userId])
+  @@index([liveId])
+  @@index([userId])
+  @@map("live_registrations")
+}
+
+// Notifications
+model Notification {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String         @db.Uuid
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type              String         // message, match, live_starting, payment_failed, etc
+  title             String
+  body              String?
+  link              String?
+
+  readAt            DateTime?
+
+  createdAt         DateTime       @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("notifications")
+}

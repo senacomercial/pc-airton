@@ -1,0 +1,43 @@
+{
+  "name": "pc-airton",
+  "version": "1.0.0",
+  "description": "Plataforma de relacionamentos sugar **por assinatura** (web-first). Monorepo do MVP.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:37941/git/senacomercial/pc-airton"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.23",
+    "@nestjs/config": "^4.0.4",
+    "@nestjs/passport": "^11.0.5",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.9.3",
+    "passport-local": "^1.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.26",
+    "@nestjs/core": "^11.1.26",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/platform-express": "^11.1.26",
+    "@prisma/client": "^7.8.0",
+    "bcryptjs": "^3.0.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "dotenv": "^17.4.2",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "redis": "^6.0.0"
+  }
+}
