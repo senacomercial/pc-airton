@@ -95,6 +95,20 @@ export class AuthService {
       throw new UnauthorizedException('E-mail ou senha incorretos');
     }
 
+    // Reativa usuários cuja suspensão temporária já expirou
+    if (
+      user.status === AccountStatus.SUSPENDED &&
+      user.suspendedUntil &&
+      user.suspendedUntil <= new Date()
+    ) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { status: AccountStatus.ACTIVE, suspendedUntil: null },
+      });
+      user.status = AccountStatus.ACTIVE;
+      user.suspendedUntil = null;
+    }
+
     // Usuários com status AWAITING_PAYMENT não podem fazer login
     // Eles voltam para fazer o pagamento
     if (user.status === AccountStatus.AWAITING_PAYMENT) {
@@ -108,6 +122,12 @@ export class AuthService {
       user.status === AccountStatus.BANNED ||
       user.status === AccountStatus.DELETED
     ) {
+      // Mensagem específica para suspensão temporária ainda vigente
+      if (user.status === AccountStatus.SUSPENDED && user.suspendedUntil) {
+        throw new UnauthorizedException(
+          `Sua conta está suspensa até ${user.suspendedUntil.toLocaleDateString('pt-BR')}.`,
+        );
+      }
       throw new UnauthorizedException(
         'Sua conta não está disponível. Contate o suporte.',
       );
