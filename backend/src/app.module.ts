@@ -10,6 +10,7 @@ import { QuestionnaireModule } from './questionnaire/questionnaire.module';
 import { MatchingModule } from './matching/matching.module';
 import { ReportsModule } from './reports/reports.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { LivesModule } from './lives/lives.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -28,6 +29,7 @@ import { HealthController } from './health.controller';
     MatchingModule,
     ReportsModule,
     ReviewsModule,
+    LivesModule,
   ],
   controllers: [HealthController],
 })
