@@ -8,6 +8,7 @@ import { VerificationModule } from './verification/verification.module';
 import { ChatModule } from './chat/chat.module';
 import { QuestionnaireModule } from './questionnaire/questionnaire.module';
 import { MatchingModule } from './matching/matching.module';
+import { ReportsModule } from './reports/reports.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -24,6 +25,7 @@ import { HealthController } from './health.controller';
     ChatModule,
     QuestionnaireModule,
     MatchingModule,
+    ReportsModule,
   ],
   controllers: [HealthController],
 })

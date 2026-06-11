@@ -19,6 +19,12 @@ enum UserType {
   SUGAR_MOMMY
 }
 
+enum UserRole {
+  USER
+  MODERATOR
+  ADMIN
+}
+
 enum GenderType {
   M
   F
@@ -116,6 +122,10 @@ model User {
 
   // Account status
   status            AccountStatus  @default(PENDING)
+  role              UserRole       @default(USER)
+
+  // Moderação
+  suspendedUntil    DateTime?      // suspensão temporária; null = sem suspensão ativa
 
   // Relations
   profile           Profile?
@@ -129,6 +139,7 @@ model User {
   reviewsReceived   Review[]        @relation("reviewed")
   reportsSubmitted  Report[]        @relation("reporter")
   reportsAgainst    Report[]        @relation("reported")
+  reportsModerated  Report[]        @relation("moderator")
   liveRegistrations LiveRegistration[]
   notifications     Notification[]
 
@@ -392,6 +403,8 @@ model Report {
 
   actionTaken       ModeratorAction?
   moderatorNotes    String?
+  moderatorId       String?        @db.Uuid
+  moderator         User?          @relation("moderator", fields: [moderatorId], references: [id], onDelete: SetNull)
   resolvedAt        DateTime?
 
   createdAt         DateTime       @default(now())
