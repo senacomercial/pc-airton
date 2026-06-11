@@ -7,7 +7,22 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '@/prisma/prisma.service';
 import { RegisterDto, LoginDto, AuthResponseDto, JwtPayloadDto } from './dto';
-import { AccountStatus } from '@prisma/client';
+import { UserTypeEnum, GenderEnum } from './dto/register.dto';
+import { AccountStatus, UserType, GenderType } from '@prisma/client';
+
+// Mapeamento dos valores da API (lowercase) → enums do Prisma
+const USER_TYPE_MAP: Record<UserTypeEnum, UserType> = {
+  [UserTypeEnum.SUGAR_DADDY]: UserType.SUGAR_DADDY,
+  [UserTypeEnum.SUGAR_BABY]: UserType.SUGAR_BABY,
+  [UserTypeEnum.SUGAR_MOMMY]: UserType.SUGAR_MOMMY,
+};
+
+const GENDER_MAP: Record<GenderEnum, GenderType> = {
+  [GenderEnum.M]: GenderType.M,
+  [GenderEnum.F]: GenderType.F,
+  [GenderEnum.NB]: GenderType.NB,
+  [GenderEnum.OTHER]: GenderType.OTHER,
+};
 
 @Injectable()
 export class AuthService {
@@ -44,8 +59,8 @@ export class AuthService {
         phone: dto.phone,
         passwordHash,
         firstName: dto.firstName,
-        userType: dto.userType,
-        gender: dto.gender,
+        userType: USER_TYPE_MAP[dto.userType],
+        gender: GENDER_MAP[dto.gender],
         birthDate: dto.birthDate,
         status: AccountStatus.AWAITING_PAYMENT,
       },
@@ -154,12 +169,12 @@ export class AuthService {
     const token = await this.jwt.signAsync(payload, {
       secret: process.env.JWT_SECRET,
       expiresIn: process.env.JWT_EXPIRATION || '1h',
-    });
+    } as any);
 
     const refreshToken = await this.jwt.signAsync(payload, {
       secret: process.env.JWT_REFRESH_SECRET,
       expiresIn: process.env.JWT_REFRESH_EXPIRATION || '7d',
-    });
+    } as any);
 
     const decoded: any = this.jwt.decode(token);
 
