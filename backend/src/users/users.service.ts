@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class UsersService {
@@ -33,10 +34,15 @@ export class UsersService {
     return profile;
   }
 
-  async updateUserProfile(userId: string, updateData: any) {
-    return this.prisma.profile.update({
+  async updateUserProfile(userId: string, updateData: UpdateProfileDto) {
+    // upsert: cria o profile se ainda não existir (evita 500 em usuários novos)
+    return this.prisma.profile.upsert({
       where: { userId },
-      data: updateData,
+      update: updateData,
+      create: {
+        userId,
+        ...updateData,
+      },
     });
   }
 }

@@ -5,11 +5,11 @@ import {
   Body,
   UseGuards,
   Req,
-  BadRequestException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Controller('api/v1/users')
 @UseGuards(JwtAuthGuard)
@@ -31,21 +31,10 @@ export class UsersController {
   @Put('profile')
   async updateProfile(
     @Req() req: Request,
-    @Body() updateData: any,
+    @Body() updateData: UpdateProfileDto,
   ) {
     const user = req.user as any;
-
-    // Validações básicas
-    if (updateData.bio && updateData.bio.length > 500) {
-      throw new BadRequestException('Bio deve ter no máximo 500 caracteres');
-    }
-
-    if (updateData.interests && updateData.interests.length > 15) {
-      throw new BadRequestException(
-        'Máximo 15 interesses permitidos',
-      );
-    }
-
+    // Validações ficam no UpdateProfileDto (class-validator)
     return this.usersService.updateUserProfile(user.sub, updateData);
   }
 }
