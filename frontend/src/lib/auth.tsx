@@ -36,6 +36,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function login(email: string, password: string) {
+    // Modo demo (GitHub Pages estático, sem backend): aceita as credenciais
+    // de demonstração localmente para liberar a navegação.
+    const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+    if (demoMode) {
+      const demoToken = 'demo-token';
+      setToken(demoToken);
+      localStorage.setItem('sd_token', demoToken);
+      setUser({ sub: 'demo', email, firstName: 'João', userType: 'SUGAR_DADDY' });
+      return;
+    }
+
     const res = await fetch('/backend/api/v1/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
