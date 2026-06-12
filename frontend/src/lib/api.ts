@@ -20,6 +20,16 @@ export async function apiGet<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+export async function apiPost<T>(path: string, body: any): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`POST ${path} -> ${res.status}`);
+  return res.json() as Promise<T>;
+}
+
 export interface MatchCandidate {
   userId: string;
   firstName: string;
@@ -35,6 +45,23 @@ export interface MatchListResponse {
   matches: MatchCandidate[];
 }
 
+export interface Profile {
+  userId: string;
+  bio?: string;
+  interests?: string[];
+  relationshipStatus?: string;
+  incomeRange?: string;
+  profilePhotoUrl?: string;
+}
+
 export async function fetchMatches(): Promise<MatchListResponse> {
   return apiGet<MatchListResponse>('/api/v1/matches');
+}
+
+export async function fetchProfile(userId: string): Promise<Profile> {
+  return apiGet<Profile>(`/api/v1/users/${userId}/profile`);
+}
+
+export async function fetchCurrentUser() {
+  return apiGet<any>('/api/v1/users/me');
 }

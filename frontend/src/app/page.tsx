@@ -67,10 +67,10 @@ export default function Landing() {
             <span style={navLink}>Planos</span>
           </div>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <Link href="/matches" style={{ height: 40, padding: '0 22px', background: 'transparent', border: `1.5px solid rgba(197,160,89,0.45)`, borderRadius: 3, color: C.gold, fontFamily: sans, fontSize: 13, fontWeight: 600, cursor: 'pointer', letterSpacing: 1, display: 'inline-flex', alignItems: 'center' }}>
+            <Link href="/login" style={{ height: 40, padding: '0 22px', background: 'transparent', border: `1.5px solid rgba(197,160,89,0.45)`, borderRadius: 3, color: C.gold, fontFamily: sans, fontSize: 13, fontWeight: 600, cursor: 'pointer', letterSpacing: 1, display: 'inline-flex', alignItems: 'center' }}>
               Entrar
             </Link>
-            <Link href="/matches" style={{ height: 40, padding: '0 22px', background: C.gold, borderRadius: 3, color: '#000', fontFamily: sans, fontSize: 13, fontWeight: 700, cursor: 'pointer', letterSpacing: 1, display: 'inline-flex', alignItems: 'center' }}>
+            <Link href="/login" style={{ height: 40, padding: '0 22px', background: C.gold, borderRadius: 3, color: '#000', fontFamily: sans, fontSize: 13, fontWeight: 700, cursor: 'pointer', letterSpacing: 1, display: 'inline-flex', alignItems: 'center' }}>
               Criar Conta
             </Link>
           </div>
@@ -92,10 +92,10 @@ export default function Landing() {
             A plataforma de relacionamentos consensuais mais segura do Brasil. Verificação comportamental, reviews reais e moderação ativa 24h.
           </div>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginBottom: 72, position: 'relative', zIndex: 1 }}>
-            <Link href="/matches" style={{ height: 56, padding: '0 44px', background: C.gold, borderRadius: 3, color: '#000', fontFamily: sans, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', letterSpacing: 2, textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center' }}>
+            <Link href="/login" style={{ height: 56, padding: '0 44px', background: C.gold, borderRadius: 3, color: '#000', fontFamily: sans, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', letterSpacing: 2, textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center' }}>
               Criar Conta — Grátis
             </Link>
-            <Link href="/matches" style={{ height: 56, padding: '0 44px', background: 'transparent', border: `1.5px solid ${C.borderGold}`, borderRadius: 3, color: C.gold, fontFamily: sans, fontSize: 13.5, fontWeight: 600, cursor: 'pointer', letterSpacing: 2, textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center' }}>
+            <Link href="/login" style={{ height: 56, padding: '0 44px', background: 'transparent', border: `1.5px solid ${C.borderGold}`, borderRadius: 3, color: C.gold, fontFamily: sans, fontSize: 13.5, fontWeight: 600, cursor: 'pointer', letterSpacing: 2, textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center' }}>
               Ver Planos
             </Link>
           </div>
@@ -139,7 +139,7 @@ export default function Landing() {
               {types.map((t) => (
                 <Link
                   key={t.name}
-                  href="/matches"
+                  href="/login"
                   style={{
                     background: C.graphite,
                     border: t.popular ? `1.5px solid ${C.borderGold}` : `1px solid ${C.border08}`,
@@ -159,7 +159,7 @@ export default function Landing() {
               ))}
             </div>
             <div style={{ textAlign: 'center' }}>
-              <Link href="/matches" style={{ height: 58, padding: '0 64px', background: C.gold, borderRadius: 3, color: '#000', fontFamily: sans, fontSize: 14, fontWeight: 700, cursor: 'pointer', letterSpacing: 2, textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center' }}>
+              <Link href="/login" style={{ height: 58, padding: '0 64px', background: C.gold, borderRadius: 3, color: '#000', fontFamily: sans, fontSize: 14, fontWeight: 700, cursor: 'pointer', letterSpacing: 2, textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center' }}>
                 Começar Agora — É Grátis
               </Link>
             </div>

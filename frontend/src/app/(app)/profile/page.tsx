@@ -1,7 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { C, serif, sans } from '@/styles/theme';
+import { fetchCurrentUser } from '@/lib/api';
 
 const dimensions = [
   { label: 'Respeito', value: 94 },
@@ -17,8 +19,43 @@ const reviews = [
 
 const overline = { fontSize: 10, fontWeight: 700, color: C.fg22, letterSpacing: '2px', textTransform: 'uppercase' as const, marginBottom: 10 };
 
+// Demo data fallback
+const DEMO_USER = {
+  id: '1',
+  firstName: 'Fernanda',
+  email: 'fernanda.baby@demo.com',
+  age: 24,
+  city: 'São Paulo',
+  state: 'SP',
+  userType: 'SUGAR_BABY',
+  profile: {
+    bio: 'Estudante de medicina, apaixonada por viagens e gastronomia. Busco conexões genuínas e transparentes. Valorizo respeito mútuo, comunicação aberta e honestidade acima de tudo.',
+    interests: ['viagens', 'gastronomia', 'medicina'],
+  },
+};
+
 export default function ProfilePage() {
   const router = useRouter();
+  const [user, setUser] = useState<any>(DEMO_USER);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCurrentUser()
+      .then((u) => setUser(u))
+      .catch(() => {
+        /* keep demo */
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ padding: '32px 40px', animation: 'fadeIn 200ms ease-out' }}>
+        <div style={{ color: C.fg50 }}>Carregando perfil...</div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ padding: '32px 40px', animation: 'fadeIn 200ms ease-out', maxWidth: 1100 }}>
       <button onClick={() => router.push('/matches')} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', color: C.fg40, fontSize: 13, cursor: 'pointer', fontFamily: sans, fontWeight: 500, marginBottom: 28, padding: 0 }}>
@@ -29,7 +66,7 @@ export default function ProfilePage() {
         {/* Left: photo + actions */}
         <div>
           <div style={{ height: 440, background: 'linear-gradient(135deg,#1A1A2E 0%,#2D1B69 100%)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', marginBottom: 16 }}>
-            <span style={{ fontFamily: serif, fontSize: 120, color: C.fg30, fontStyle: 'italic' }}>F</span>
+            <span style={{ fontFamily: serif, fontSize: 120, color: C.fg30, fontStyle: 'italic' }}>{user.firstName?.[0] || 'F'}</span>
             <div style={{ position: 'absolute', top: 16, right: 16, display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 9999, padding: '6px 14px' }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: C.green }} />
               <span style={{ fontSize: 12, color: C.fg82, fontWeight: 500 }}>Online agora</span>
@@ -50,8 +87,10 @@ export default function ProfilePage() {
         <div>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
             <div>
-              <div style={{ fontFamily: serif, fontSize: 40, fontWeight: 700, color: '#fff', lineHeight: 1.0, marginBottom: 6 }}>Fernanda</div>
-              <div style={{ fontSize: 14, color: C.fg38 }}>24 anos · São Paulo, SP · Sugar Baby</div>
+              <div style={{ fontFamily: serif, fontSize: 40, fontWeight: 700, color: '#fff', lineHeight: 1.0, marginBottom: 6 }}>{user.firstName}</div>
+              <div style={{ fontSize: 14, color: C.fg38 }}>
+                {user.age} anos · {user.city}, {user.state} · {user.userType === 'SUGAR_BABY' ? 'Sugar Baby' : user.userType === 'SUGAR_DADDY' ? 'Sugar Daddy' : 'Sugar Mommy'}
+              </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: C.goldTint, border: '1px solid rgba(197,160,89,0.25)', borderRadius: 8, padding: '12px 20px', textAlign: 'center' }}>
               <span style={{ fontFamily: serif, fontSize: 32, fontWeight: 700, color: C.gold, lineHeight: 1 }}>87</span>
@@ -68,9 +107,7 @@ export default function ProfilePage() {
 
           <div style={{ marginBottom: 24 }}>
             <div style={overline}>Sobre mim</div>
-            <div style={{ fontSize: 14.5, color: C.fg58, lineHeight: 1.8 }}>
-              Estudante de medicina, apaixonada por viagens e gastronomia. Busco conexões genuínas e transparentes. Valorizo respeito mútuo, comunicação aberta e honestidade acima de tudo.
-            </div>
+            <div style={{ fontSize: 14.5, color: C.fg58, lineHeight: 1.8 }}>{user.profile?.bio || 'Sem bio disponível'}</div>
           </div>
 
           <div style={{ marginBottom: 24 }}>

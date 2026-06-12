@@ -31,12 +31,14 @@ export default function MatchesPage() {
   const router = useRouter();
   const [tab, setTab] = useState('para-voce');
   const [cards, setCards] = useState<Card[]>(DEMO);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Tenta a API real; mantém o fallback de demonstração em caso de erro.
     fetchMatches()
       .then((r) => { if (r?.matches?.length) setCards(r.matches); })
-      .catch(() => { /* mantém DEMO */ });
+      .catch(() => { /* mantém DEMO */ })
+      .finally(() => setLoading(false));
   }, []);
 
   return (
