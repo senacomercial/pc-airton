@@ -35,7 +35,7 @@ const features = [
 ];
 
 const types = [
-  { icon: '💎', name: 'Sugar Daddy', body: 'Ofereço experiências, suporte financeiro e momentos especiais para conexões genuínas.', price: 'R$99,90/mês', popular: false },
+  { icon: '👑', name: 'Sugar Daddy', body: 'Ofereço experiências, suporte financeiro e momentos especiais para conexões genuínas.', price: 'R$99,90/mês', popular: false },
   { icon: '🌸', name: 'Sugar Baby', body: 'Busco conexões genuínas e relacionamentos consensuais com benefícios mútuos.', price: 'R$19,90/mês', popular: true },
 ];
 
