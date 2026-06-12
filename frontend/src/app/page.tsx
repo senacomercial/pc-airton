@@ -37,7 +37,6 @@ const features = [
 const types = [
   { icon: '💎', name: 'Sugar Daddy', body: 'Ofereço experiências, suporte financeiro e momentos especiais para conexões genuínas.', price: 'R$99,90/mês', popular: false },
   { icon: '🌸', name: 'Sugar Baby', body: 'Busco conexões genuínas e relacionamentos consensuais com benefícios mútuos.', price: 'R$19,90/mês', popular: true },
-  { icon: '👑', name: 'Sugar Mommy', body: 'Ofereço experiências únicas, suporte e companhia para momentos inesquecíveis.', price: 'R$99,90/mês', popular: false },
 ];
 
 const stats = [
@@ -84,16 +83,16 @@ export default function Landing() {
             <span style={{ fontSize: 11, fontWeight: 600, color: C.fg55, letterSpacing: '2.5px', textTransform: 'uppercase' }}>Verificado · Seguro · Consensual</span>
           </div>
           <div style={{ fontFamily: serif, fontSize: 76, fontWeight: 700, color: '#fff', lineHeight: 1.0, letterSpacing: '-2.5px', marginBottom: 28, maxWidth: 860, position: 'relative', zIndex: 1 }}>
-            Relacionamentos com<br />
-            <em style={{ color: C.gold, fontStyle: 'italic' }}>Transparência</em><br />
+            Relacionamento de Luxo<br />
+            com <em style={{ color: C.gold, fontStyle: 'italic' }}>Transparência</em><br />
             e Segurança
           </div>
           <div style={{ fontSize: 17, color: C.fg42, lineHeight: 1.75, marginBottom: 52, maxWidth: 540, fontWeight: 400, position: 'relative', zIndex: 1 }}>
-            A plataforma de relacionamentos consensuais mais segura do Brasil. Verificação comportamental, reviews reais e moderação ativa 24h.
+            A plataforma de relacionamentos de luxo mais segura do Brasil. Verificação real, reviews e moderação ativa 24h.
           </div>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginBottom: 72, position: 'relative', zIndex: 1 }}>
             <Link href="/login" style={{ height: 56, padding: '0 44px', background: C.gold, borderRadius: 3, color: '#000', fontFamily: sans, fontSize: 13.5, fontWeight: 700, cursor: 'pointer', letterSpacing: 2, textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center' }}>
-              Criar Conta — Grátis
+              Criar Conta
             </Link>
             <Link href="/login" style={{ height: 56, padding: '0 44px', background: 'transparent', border: `1.5px solid ${C.borderGold}`, borderRadius: 3, color: C.gold, fontFamily: sans, fontSize: 13.5, fontWeight: 600, cursor: 'pointer', letterSpacing: 2, textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center' }}>
               Ver Planos
@@ -114,7 +113,7 @@ export default function Landing() {
           <div style={{ maxWidth: 1140, margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: 60 }}>
               <div style={{ fontSize: 10, fontWeight: 700, color: C.gold, letterSpacing: '3px', textTransform: 'uppercase', marginBottom: 12 }}>Como funciona</div>
-              <div style={{ fontFamily: serif, fontSize: 44, fontWeight: 700, color: '#fff' }}>Seguro do começo ao fim</div>
+              <div style={{ fontFamily: serif, fontSize: 44, fontWeight: 700, color: '#fff' }}>Pare de perder tempo com quem não te valoriza</div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 28 }}>
               {features.map((f) => (
@@ -135,7 +134,7 @@ export default function Landing() {
               <div style={{ fontSize: 10, fontWeight: 700, color: C.gold, letterSpacing: '3px', textTransform: 'uppercase', marginBottom: 12 }}>Para você</div>
               <div style={{ fontFamily: serif, fontSize: 44, fontWeight: 700, color: '#fff' }}>Escolha seu perfil</div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 24, marginBottom: 52 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 52, maxWidth: 760, marginLeft: 'auto', marginRight: 'auto' }}>
               {types.map((t) => (
                 <Link
                   key={t.name}
@@ -160,7 +159,7 @@ export default function Landing() {
             </div>
             <div style={{ textAlign: 'center' }}>
               <Link href="/login" style={{ height: 58, padding: '0 64px', background: C.gold, borderRadius: 3, color: '#000', fontFamily: sans, fontSize: 14, fontWeight: 700, cursor: 'pointer', letterSpacing: 2, textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center' }}>
-                Começar Agora — É Grátis
+                Começar Agora
               </Link>
             </div>
           </div>
