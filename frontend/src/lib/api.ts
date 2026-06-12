@@ -1,0 +1,40 @@
+/**
+ * Cliente HTTP fino para a API do Sugar Dream (NestJS).
+ * Em dev, as chamadas passam pelo rewrite /backend -> backend NestJS (ver next.config.js).
+ * O token JWT, quando presente, é lido do localStorage.
+ */
+const BASE = '/backend';
+
+function authHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') return {};
+  const token = window.localStorage.getItem('sd_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+export async function apiGet<T>(path: string): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error(`GET ${path} -> ${res.status}`);
+  return res.json() as Promise<T>;
+}
+
+export interface MatchCandidate {
+  userId: string;
+  firstName: string;
+  age: number;
+  city?: string;
+  state?: string;
+  compatibilityScore: number;
+  profilePhotoUrl?: string;
+}
+
+export interface MatchListResponse {
+  totalMatches: number;
+  matches: MatchCandidate[];
+}
+
+export async function fetchMatches(): Promise<MatchListResponse> {
+  return apiGet<MatchListResponse>('/api/v1/matches');
+}
