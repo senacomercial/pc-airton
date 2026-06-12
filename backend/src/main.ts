@@ -54,8 +54,10 @@ async function bootstrap() {
     swaggerOptions: { persistAuthorization: true },
   });
 
-  const port = parseInt(process.env.API_PORT || '3000');
-  await app.listen(port);
+  // Railway (e a maioria das PaaS) injeta a porta via PORT. Mantemos
+  // API_PORT como fallback para o ambiente local.
+  const port = parseInt(process.env.PORT || process.env.API_PORT || '3000');
+  await app.listen(port, '0.0.0.0');
 
   console.log(`🚀 Sugar Dream API rodando em http://localhost:${port}`);
   console.log(`📚 Documentação Swagger em http://localhost:${port}/api/docs`);

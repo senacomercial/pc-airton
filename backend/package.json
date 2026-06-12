@@ -7,10 +7,12 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "build": "nest build",
+    "build": "prisma generate && nest build",
+    "start:prod": "node dist/main.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
     "db:seed": "ts-node prisma/seed.ts",
     "lint": "eslint \"{src,test}/**/*.ts\""
   },
