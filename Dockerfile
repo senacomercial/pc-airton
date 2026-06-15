@@ -1,26 +1,24 @@
-FROM node:20-alpine
+# Debian slim com OpenSSL 3.x — necessário para os engines do Prisma.
+FROM node:20-slim
 
-WORKDIR /app
+# Prisma precisa do OpenSSL instalado no runtime.
+RUN apt-get update -y \
+  && apt-get install -y openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
-# Copy backend package files
-COPY backend/package*.json ./backend/
-
-# Copy prisma schema
-COPY backend/prisma ./backend/prisma/
-
-# Install backend dependencies
 WORKDIR /app/backend
-RUN npm ci
 
-# Copy backend source code
-COPY backend/src ./src/
-COPY backend/tsconfig.json ./
+# Instala dependências (inclui devDeps para prisma/nest CLI no build).
+COPY backend/package*.json ./
+RUN npm ci --include=dev
 
-# Build backend
+# Copia o restante do código do backend.
+COPY backend/ ./
+
+# Gera o Prisma Client e compila o NestJS.
 RUN npm run build
 
-# Expose port
 EXPOSE 3000
 
-# Start the application
-CMD ["npm", "run", "start"]
+# Aplica as migrations e sobe a API.
+CMD ["sh", "-c", "npm run db:deploy && npm run start:prod"]
